@@ -34,7 +34,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.medium,
+      ResolutionPreset.low,
     );
 
     client = http.Client();
@@ -50,7 +50,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   Future<String> uploadFile(XFile image) async {
-    var postUri = Uri.parse("http://192.168.0.109:5000/getchar");
+    var postUri = Uri.parse("http://2.tcp.ngrok.io:18644/getchar");
     var request = new http.MultipartRequest("POST", postUri);
     request.files.add(new http.MultipartFile.fromBytes(
         'file', await image.readAsBytes(),
@@ -118,11 +118,12 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             });
                             if (!inProgress) {
                               inProgress = true;
-                              while (inProgress) {
+                              for (; inProgress;) {
                                 image = await _controller.takePicture();
                                 imageArray.add(image);
-                                uploadFile(image);
-                                // todo: send email
+                                print(image.path);
+                                await uploadFile(image);
+                                // todo: send emails
                               }
                               //Send the image to backend
                             }
