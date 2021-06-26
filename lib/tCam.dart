@@ -63,12 +63,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     request.files.add(multipartFile);
 
     var response = await request.send();
-    print(response.statusCode);
-
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
-    return '';
+    final respStr = await response.stream.bytesToString();
+    final data = json.decode(respStr);
+    print(data);
+    return data['character'];
   }
 
   @override
