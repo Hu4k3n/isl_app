@@ -114,15 +114,17 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                       child: TextButton(
                         onPressed: () {
                           setState(() {
-                            text = "Completed";
-                            inProgress = false;
-                            //recieve text from backend
-                            //
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DisplayTranslate()),
-                            );
+                            if (inProgress) {
+                              text = "Press start";
+                              inProgress = false;
+                              //recieve text from backend
+                              //
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DisplayTranslate()),
+                              );
+                            }
                           });
                         },
                         child: const Icon(Icons.stop_circle),
@@ -162,13 +164,17 @@ class DisplayTranslate extends StatefulWidget {
 }
 
 class _DisplayTranslateState extends State<DisplayTranslate> {
+  String text = "Loading ... ";
+  @override
+  void initState() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Translated')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Center(child: Text("here")),
+      body: Center(child: Text(text)),
     );
   }
 }
