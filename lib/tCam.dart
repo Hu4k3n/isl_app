@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -62,9 +60,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
     request.files.add(multipartFile);
 
-    var response = await request.send();
-    final respStr = await response.stream.bytesToString();
-    final data = json.decode(respStr);
+    // var response = await request.send();
+    // final respStr = await response.stream.bytesToString();
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    final data = json.decode(response.body);
     print(data);
     return data['character'];
   }
@@ -124,7 +126,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                                 image = await _controller.takePicture();
                                 imageArray.add(image);
                                 print(image.path);
-                                await uploadFile(image);
+                                var c = await uploadFile(image);
+                                print("Got the character" + c);
                                 // todo: send emails
                               }
                               //Send the image to backend
