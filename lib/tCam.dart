@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:isl/translated.dart';
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -20,6 +21,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
+  String text = "Press Start";
+  bool inProgress = false;
   @override
   void initState() {
     super.initState();
@@ -46,78 +49,92 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
+      appBar: AppBar(title: const Text('ISL')),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the preview.
-            return CameraPreview(_controller);
-          } else {
-            // Otherwise, display a loading indicator.
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          width: double.maxFinite,
-          height: 180,
-          color: Colors.blue,
-          child: Card(
-            shadowColor: Colors.black,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text(
-                    "Translated text",
-                    style: TextStyle(fontSize: 30),
-                  ),
+      body: Stack(
+        children: [
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                // If the Future is complete, display the preview.
+                return CameraPreview(_controller);
+              } else {
+                // Otherwise, display a loading indicator.
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.maxFinite,
+              height: 180,
+              color: Colors.blue,
+              child: Card(
+                shadowColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    Align(
+                      alignment: Alignment(0, 0),
+                      child: TextButton(
+                        onPressed: () async {
+                          try {
+                            await _initializeControllerFuture;
+                            List<XFile> imageArray = [];
+                            XFile image;
+                            setState(() {
+                              text = "Press stop after some time";
+                            });
+                            if (!inProgress) {
+                              inProgress = true;
+                              while (inProgress) {
+                                image = await _controller.takePicture();
+                                imageArray.add(image);
+                              }
+                              //Send the image to backend
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        child: const Icon(Icons.play_arrow),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment(0, 0),
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            text = "Completed";
+                            inProgress = false;
+                            //recieve text from backend
+                            //
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => Translate()),
+                            // );
+                          });
+                        },
+                        child: const Icon(Icons.stop_circle),
+                      ),
+                    ),
+                  ],
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: FloatingActionButton(
-                    // Provide an onPressed callback.
-                    onPressed: () async {
-                      // Take the Picture in a try / catch block. If anything goes wrong,
-                      // catch the error.
-                      try {
-                        // Ensure that the camera is initialized.
-                        await _initializeControllerFuture;
-
-                        // Attempt to take a picture and get the file `image`
-                        // where it was saved.
-                        final image = await _controller.takePicture();
-
-                        // If the picture was taken, display it on a new screen.
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => DisplayPictureScreen(
-                              // Pass the automatically generated path to
-                              // the DisplayPictureScreen widget.
-                              imagePath: image.path,
-                            ),
-                          ),
-                        );
-                      } catch (e) {
-                        // If an error occurs, log the error to the console.
-                        print(e);
-                      }
-                    },
-                    child: const Icon(Icons.camera_alt),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
