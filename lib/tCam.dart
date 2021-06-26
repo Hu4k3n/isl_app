@@ -159,6 +159,17 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment(0, -0.5),
+            child: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Colors.blue),
+              ),
+            ),
+          )
         ],
       ),
     );
