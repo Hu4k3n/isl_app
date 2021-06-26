@@ -75,20 +75,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       print(value);
     });
     return '';
-    // var request = new http.MultipartRequest("POST", postUri);
-    // request.files.add(new http.MultipartFile.fromBytes(
-    //     'file', await image.readAsBytes(),
-    //     contentType: new MediaType('image', 'jpeg')));
-
-    // await request.send().then((response) async {
-    //   if (response.statusCode == 200) print("Uploaded!");
-    //   print('Response status: ${response.statusCode}');
-    //   var r = await http.Response.fromStream(response);
-    //   var responseBody = json.decode(r.body);
-    //   print('Character ${responseBody['character']}');
-    //   return responseBody['character'];
-    // });
-    // return ''; // for nullsafety
   }
 
   @override
