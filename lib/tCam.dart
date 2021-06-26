@@ -24,6 +24,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   String text = "Press Start";
   bool inProgress = false;
+  List responseChar = [];
   @override
   void initState() {
     super.initState();
@@ -46,6 +47,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<String> sendChar(List characters) async {
+    var url = 'http://2.tcp.ngrok.io:18644/getwords';
+
+    Map data = {'characters': characters};
+    var body = json.encode(data);
+
+    var response = await http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"}, body: body);
+    print("${response.statusCode}");
+    print("${response.body}");
+
+    final dataSend = json.decode(response.body);
+    print(dataSend);
+    return dataSend['RESPONSE'];
   }
 
   Future<String> uploadFile(XFile image) async {
@@ -128,6 +145,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                                 print(image.path);
                                 var c = await uploadFile(image);
                                 print("Got the character" + c);
+                                responseChar.add(c);
                                 // todo: send emails
                               }
                               //Send the image to backend
@@ -142,20 +160,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                     Align(
                       alignment: Alignment(0, 0),
                       child: TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             if (inProgress) {
                               text = "Press start";
                               inProgress = false;
-                              //recieve text from backend
-                              //
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DisplayTranslate()),
-                              );
                             }
                           });
+
+                          //recieve text from backend
+                          //
+                          String msg = await sendChar(responseChar);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DisplayTranslate(msg)),
+                          );
                         },
                         child: const Icon(Icons.stop_circle),
                       ),
@@ -197,25 +217,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 //   }
 // }
 
-class DisplayTranslate extends StatefulWidget {
-  DisplayTranslate({Key? key}) : super(key: key);
-
-  @override
-  _DisplayTranslateState createState() => _DisplayTranslateState();
-}
-
-class _DisplayTranslateState extends State<DisplayTranslate> {
-  String text = "Loading ... ";
-  @override
-  void initState() {}
-
+class DisplayTranslate extends StatelessWidget {
+  final String msg;
+  const DisplayTranslate(this.msg, {Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Translated')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Center(child: Text(text)),
+      body: Center(
+        child: Text(msg),
+      ),
     );
   }
 }
