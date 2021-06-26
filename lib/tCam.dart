@@ -49,7 +49,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   uploadFile(XFile image) async {
-    var postUri = Uri.parse("https://otp-asdf.free.beeceptor.com");
+    var postUri = Uri.parse("https://asdf.free.beeceptor.com");
     var request = new http.MultipartRequest("POST", postUri);
     request.files.add(new http.MultipartFile.fromBytes(
         'file', await image.readAsBytes(),
@@ -152,6 +152,17 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment(0, -0.5),
+            child: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Colors.blue),
+              ),
+            ),
+          )
         ],
       ),
     );
