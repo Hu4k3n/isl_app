@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -48,7 +49,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
-  uploadFile(XFile image) async {
+  Future<String> uploadFile(XFile image) async {
     var postUri = Uri.parse("http://192.168.0.109:5000/getchar");
     var request = new http.MultipartRequest("POST", postUri);
     request.files.add(new http.MultipartFile.fromBytes(
@@ -59,8 +60,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       if (response.statusCode == 200) print("Uploaded!");
       print('Response status: ${response.statusCode}');
       var r = await http.Response.fromStream(response);
-      print('Response body: ${r.body}');
+      var responseBody = json.decode(r.body);
+      print('Character ${responseBody['character']}');
+      return responseBody['character'];
     });
+    return ''; // for nullsafety
   }
 
   @override
