@@ -1,25 +1,64 @@
-import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
+import 'tCam.dart';
+import 'package:flutter/material.dart'
+    show
+        Align,
+        Alignment,
+        AppBar,
+        BuildContext,
+        Card,
+        Center,
+        Colors,
+        Container,
+        FloatingActionButton,
+        Icons,
+        Key,
+        MaterialApp,
+        MaterialPageRoute,
+        Scaffold,
+        Stack,
+        State,
+        StatefulWidget,
+        StatelessWidget,
+        Text,
+        TextButton,
+        TextStyle,
+        ThemeData,
+        Widget,
+        runApp;
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final cameras = await availableCameras();
+  final firstCamera = cameras.first;
+  runApp(MyApp(camera: firstCamera));
 }
 
 class MyApp extends StatelessWidget {
+  final CameraDescription camera;
+
+  const MyApp({
+    required this.camera,
+  });
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ISL',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'ISL', camera: camera),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  final CameraDescription camera;
+  MyHomePage({Key? key, required this.title, required this.camera})
+      : super(key: key);
 
   final String title;
 
@@ -28,31 +67,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  late CameraController _controller;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
           title: Text(widget.title),
         ),
         body: Stack(
           children: [
-            Center(child: Text("camera")),
             Card(
               child: Align(
                 alignment: Alignment.bottomCenter,
@@ -68,6 +92,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
               ),
             ),
+            Align(
+                alignment: Alignment(0, 0.5),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    print("buttonPressed ");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                TakePictureScreen(camera: widget.camera)));
+                  },
+                  child: const Icon(Icons.camera_alt),
+                )),
           ],
         ));
   }
