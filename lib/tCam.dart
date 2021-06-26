@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -51,20 +52,43 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   Future<String> uploadFile(XFile image) async {
     var postUri = Uri.parse("http://2.tcp.ngrok.io:18644/getchar");
-    var request = new http.MultipartRequest("POST", postUri);
-    request.files.add(new http.MultipartFile.fromBytes(
-        'file', await image.readAsBytes(),
-        contentType: new MediaType('image', 'jpeg')));
+    var stream = new http.ByteStream(image.openRead());
+    // get file length
+    var length = await image.length();
 
-    await request.send().then((response) async {
-      if (response.statusCode == 200) print("Uploaded!");
-      print('Response status: ${response.statusCode}');
-      var r = await http.Response.fromStream(response);
-      var responseBody = json.decode(r.body);
-      print('Character ${responseBody['character']}');
-      return responseBody['character'];
+    // create multipart request
+    var request = new http.MultipartRequest("POST", postUri);
+
+    // multipart that takes file
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(image.path));
+
+    // add file to multipart
+    request.files.add(multipartFile);
+
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+    // listen for response
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
     });
-    return ''; // for nullsafety
+    return '';
+    // var request = new http.MultipartRequest("POST", postUri);
+    // request.files.add(new http.MultipartFile.fromBytes(
+    //     'file', await image.readAsBytes(),
+    //     contentType: new MediaType('image', 'jpeg')));
+
+    // await request.send().then((response) async {
+    //   if (response.statusCode == 200) print("Uploaded!");
+    //   print('Response status: ${response.statusCode}');
+    //   var r = await http.Response.fromStream(response);
+    //   var responseBody = json.decode(r.body);
+    //   print('Character ${responseBody['character']}');
+    //   return responseBody['character'];
+    // });
+    // return ''; // for nullsafety
   }
 
   @override
