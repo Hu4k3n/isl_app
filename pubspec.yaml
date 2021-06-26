@@ -27,6 +27,7 @@ dependencies:
   path_provider:
   path:
   avatar_glow:
+  http:
 
 
   # The following adds the Cupertino Icons font to your application.

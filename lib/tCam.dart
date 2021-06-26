@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,7 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  var client;
 
   String text = "Press Start";
   bool inProgress = false;
@@ -34,6 +36,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ResolutionPreset.medium,
     );
 
+    client = http.Client();
     // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
@@ -43,6 +46,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
+  }
+
+  uploadFile(XFile image) async {
+    var postUri = Uri.parse("https://otp-asdf.free.beeceptor.com");
+    var request = new http.MultipartRequest("POST", postUri);
+    request.files.add(new http.MultipartFile.fromBytes(
+        'file', await image.readAsBytes(),
+        contentType: new MediaType('image', 'jpeg')));
+
+    await request.send().then((response) {
+      if (response.statusCode == 200) print("Uploaded!");
+    });
   }
 
   @override
@@ -99,6 +114,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                               while (inProgress) {
                                 image = await _controller.takePicture();
                                 imageArray.add(image);
+                                uploadFile(image);
+                                // todo: send email
                               }
                               //Send the image to backend
                             }
