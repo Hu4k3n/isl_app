@@ -53,24 +53,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Future<String> uploadFile(XFile image) async {
     var postUri = Uri.parse("http://2.tcp.ngrok.io:18644/getchar");
     var stream = new http.ByteStream(image.openRead());
-    // get file length
     var length = await image.length();
 
-    // create multipart request
     var request = new http.MultipartRequest("POST", postUri);
 
-    // multipart that takes file
     var multipartFile = new http.MultipartFile('file', stream, length,
         filename: basename(image.path));
 
-    // add file to multipart
     request.files.add(multipartFile);
 
-    // send
     var response = await request.send();
     print(response.statusCode);
 
-    // listen for response
     response.stream.transform(utf8.decoder).listen((value) {
       print(value);
     });
