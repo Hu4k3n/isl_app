@@ -49,14 +49,17 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   uploadFile(XFile image) async {
-    var postUri = Uri.parse("https://otp-asdf.free.beeceptor.com");
+    var postUri = Uri.parse("http://192.168.0.109:5000/getchar");
     var request = new http.MultipartRequest("POST", postUri);
     request.files.add(new http.MultipartFile.fromBytes(
         'file', await image.readAsBytes(),
         contentType: new MediaType('image', 'jpeg')));
 
-    await request.send().then((response) {
+    await request.send().then((response) async {
       if (response.statusCode == 200) print("Uploaded!");
+      print('Response status: ${response.statusCode}');
+      var r = await http.Response.fromStream(response);
+      print('Response body: ${r.body}');
     });
   }
 
