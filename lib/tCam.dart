@@ -118,11 +118,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             inProgress = false;
                             //recieve text from backend
                             //
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => Translate()),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DisplayTranslate()),
+                            );
                           });
                         },
                         child: const Icon(Icons.stop_circle),
@@ -140,19 +140,35 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 }
 
 // A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
+// class DisplayTranslateScreen extends StatelessWidget {
+//   const DisplayTranslateScreen({Key? key}) : super(key: key);
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Display the Picture')),
+//       // The image is stored as a file on the device. Use the `Image.file`
+//       // constructor with the given path to display the image.
+//       body: Center(child: Text("here")),
+//     );
+//   }
+// }
 
+class DisplayTranslate extends StatefulWidget {
+  DisplayTranslate({Key? key}) : super(key: key);
+
+  @override
+  _DisplayTranslateState createState() => _DisplayTranslateState();
+}
+
+class _DisplayTranslateState extends State<DisplayTranslate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
+      appBar: AppBar(title: const Text('Translated')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: Center(child: Text("here")),
     );
   }
 }

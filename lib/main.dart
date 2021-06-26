@@ -1,3 +1,4 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'tCam.dart';
@@ -77,23 +78,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: Stack(
           children: [
-            Card(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                    height: 100,
-                    width: double.infinity,
-                    color: Colors.yellow,
-                    child: Center(
-                      child: Text(
-                        "text thingy",
-                        style: TextStyle(backgroundColor: Colors.orange),
-                      ),
-                    )),
-              ),
-            ),
-            Align(
-                alignment: Alignment(0, 0.5),
+            Center(
+              child: AvatarGlow(
+                endRadius: 150,
+                duration: Duration(seconds: 2),
+                glowColor: Colors.blue,
+                repeat: true,
+                repeatPauseDuration: Duration(seconds: 2),
                 child: FloatingActionButton(
                   onPressed: () {
                     print("buttonPressed ");
@@ -104,7 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 TakePictureScreen(camera: widget.camera)));
                   },
                   child: const Icon(Icons.camera_alt),
-                )),
+                ),
+              ),
+            ),
+            Align(
+                alignment: Alignment(0, -0.5),
+                child: Text("Read4Me", style: TextStyle(fontSize: 30)))
           ],
         ));
   }
